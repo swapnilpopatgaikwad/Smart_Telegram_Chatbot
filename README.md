@@ -95,6 +95,13 @@ You can deploy this workflow on:
 
 ---
 
+## 📸 Demo Screenshot
+
+![workflow](assets/demo.png)
+
+---
+
+
 ## 📌 Notes
 
 - The Telegram Bot must be set to **allow voice messages**
