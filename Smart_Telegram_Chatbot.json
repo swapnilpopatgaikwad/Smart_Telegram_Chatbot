@@ -1,0 +1,276 @@
+{
+  "name": "Smart Telegram Chatbot",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -560,
+        -60
+      ],
+      "id": "08290882-a58d-48df-95ee-871fabb34e0c",
+      "name": "Telegram Trigger",
+      "webhookId": "555d298f-002c-44bb-8fbf-bfc91aeb38ef",
+      "credentials": {
+        "telegramApi": {
+          "id": "cXZjJMyZ2G8qg28W",
+          "name": "Smart Telegram Chatbot (AI-Powered Auto-Responder)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        240,
+        140
+      ],
+      "id": "5633d839-f1d5-4234-a140-b24b9cec4926",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "00JUsXMonOFlkAmm",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.transcription }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        320,
+        -60
+      ],
+      "id": "9df676c1-1855-4cfb-ba16-a9e8b951b359",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": " https://api.speaknotes.io/convert",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "toolType",
+              "value": "transcription"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        80,
+        -60
+      ],
+      "id": "4e3d8f66-7355-4b77-851d-93c9bed70a0b",
+      "name": "Convert Audio to Transcription",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "chatId": "5138771073",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        700,
+        -60
+      ],
+      "id": "a1bfb202-9cf4-4f77-a3c0-eb5c7a469785",
+      "name": "Telegram",
+      "webhookId": "b8a2e4c7-7c1c-4379-ba36-d64427a29fd5",
+      "credentials": {
+        "telegramApi": {
+          "id": "cXZjJMyZ2G8qg28W",
+          "name": "Smart Telegram Chatbot (AI-Powered Auto-Responder)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.telegram.org/file/bot7944926025:AAHzvLfCFnOtIWah3BdgPht6Xjd4uON4YWU/{{ $json.result.file_path }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -140,
+        -60
+      ],
+      "id": "33ec44a5-e082-4b59-98f9-6fcb4779b643",
+      "name": "Featch Audio File"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.telegram.org/bot7944926025:AAHzvLfCFnOtIWah3BdgPht6Xjd4uON4YWU/getFile?file_id={{ $json.message.voice.file_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -340,
+        -60
+      ],
+      "id": "25fc8b65-86fa-4865-9d2c-8036fa6b470f",
+      "name": "Get Audio File Details"
+    }
+  ],
+  "pinData": {
+    "Telegram Trigger": [
+      {
+        "json": {
+          "update_id": 153140328,
+          "message": {
+            "message_id": 7,
+            "from": {
+              "id": 5138771073,
+              "is_bot": false,
+              "first_name": "Swapnil",
+              "last_name": "Gaikwad",
+              "language_code": "en"
+            },
+            "chat": {
+              "id": 5138771073,
+              "first_name": "Swapnil",
+              "last_name": "Gaikwad",
+              "type": "private"
+            },
+            "date": 1750133040,
+            "voice": {
+              "duration": 7,
+              "mime_type": "audio/ogg",
+              "file_id": "AwACAgUAAxkBAAMHaFDpMOWFRP0GyK2DI0_t59jI0jwAAgMaAAIuLolWwSuGS8ekRVk2BA",
+              "file_unique_id": "AgADAxoAAi4uiVY",
+              "file_size": 36722
+            }
+          }
+        }
+      }
+    ],
+    "Convert Audio to Transcription": [
+      {
+        "json": {
+          "transcription": "you create a hello program in C sharp"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Audio File Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert Audio to Transcription": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Featch Audio File": {
+      "main": [
+        [
+          {
+            "node": "Convert Audio to Transcription",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Audio File Details": {
+      "main": [
+        [
+          {
+            "node": "Featch Audio File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cd282ab8-e663-4d12-8346-e1f83da0de7d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "44ecb7e2733209fe8cf7cfd8292687b1093b8464bb110cc2b3b117df33fbf111"
+  },
+  "id": "uZyZ3kb9csr2dpXg",
+  "tags": [
+    {
+      "createdAt": "2025-06-15T09:53:22.554Z",
+      "updatedAt": "2025-06-15T09:53:22.554Z",
+      "id": "DM9siGrXLktH32Zi",
+      "name": "Auto-Responder"
+    }
+  ]
+}
